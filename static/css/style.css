@@ -28,13 +28,13 @@
 .wrapper {
   display: grid;
   grid-gap: 0px;
-  grid-template-columns: repeat(8, 100px);
-  grid-template-rows: repeat(8, 100px);
+  grid-template-columns: repeat(8, 50px);
+  grid-template-rows: repeat(8, 50px);
   grid-auto-flow: row;
 }
 
 .glyphicon {
-    font-size: 100px;
+    font-size: 50px;
 }
 
 .glyphicon-plus-sign{
