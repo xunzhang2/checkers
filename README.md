@@ -10,19 +10,7 @@ class Game (Thread)</br>
 class Player</br>
 
 One game contains one current_player which points to opponent. Two players points to each other.</br>
-
-class Game (Thread) contains: </br>
-    current player (Player) <--(points each other)--> opponent (Player)</br>
-    board array: len=64, val in (-1, 0, 1)</br>
-    board value encoding (signed 32-bit int * 4): | 0~31 current player | 32~63 current player | 0~32 opponent | 32~63 opponent | </br>
-    json payload: mocks input stream of socket, because flask-socketio does not return connection instance. </br>
-    ...</br>
-</br>
-class Player contains: </br>
-    pointer to opponent</br>
-    socket id</br>
-    ...</br>
-</br>    
+    
 class Model: mocks memory and database</br>
 </br>
 Gateway (app.py) receives incoming requests and creates threads to do work.</br>
