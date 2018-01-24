@@ -1,0 +1,50 @@
+.center {
+    margin: auto;
+    width: 60%;
+}
+
+.box {
+  color: #fff;
+  padding: 0px;
+  text-align: center;
+}
+
+.box_odd {
+  background-color: #D3D3D3;
+}
+
+.box_even {
+  background-color:#D3D3D3;
+}
+
+.box_odd:nth-child(even) {
+  background-color: #A9A9A9;
+}
+
+.box_even:nth-child(odd) {
+  background-color: #A9A9A9;
+}
+
+.wrapper {
+  display: grid;
+  grid-gap: 0px;
+  grid-template-columns: repeat(8, 100px);
+  grid-template-rows: repeat(8, 100px);
+  grid-auto-flow: row;
+}
+
+.glyphicon {
+    font-size: 100px;
+}
+
+.glyphicon-plus-sign{
+  color: #009933;
+}
+
+.glyphicon-minus-sign{
+  color: #0066ff;
+}
+
+
+
+
