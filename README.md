@@ -1,8 +1,8 @@
 # Two-player Checkers
 
 ## Demo
-Website: http://34.230.44.118:5000/
-Vedio: https://www.youtube.com/watch?v=aiqTH5YXh2o
+Website: http://34.230.44.118:5000/ </br>
+Vedio: https://www.youtube.com/watch?v=aiqTH5YXh2o  </br>
 
 ## Tools
 Back end: flask, flask-socketio, python </br>
