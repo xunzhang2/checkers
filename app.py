@@ -52,7 +52,7 @@ def on_json(json):
 			game.set_json(jsonDict)
 			# waiting for game to calculate response
 			while(not game.get_response()):
-				time.sleep(5)
+				time.sleep(2)
 			response=game.get_response()
 			game.set_response(None)
 		socketio.emit('response',response,room=room)

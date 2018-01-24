@@ -59,7 +59,8 @@ class Game(Thread):
 					self.__response=self.handle_request(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
 					print '**return response',self.__response
 					self.__json=None
-				time.sleep(5)
+				time.sleep(2)
+			time.sleep(5)
 
 	
 
