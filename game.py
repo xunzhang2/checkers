@@ -66,7 +66,6 @@ class Game(Thread):
 	# start and end are always within range			
 	# "input_stream": __self.json
 	def handle_request(self, start, end):
-
 		start=int(start)
 		end=int(end)
 		direction_factor= 1 if self.__json['side']=='+' else -1
@@ -83,57 +82,66 @@ class Game(Thread):
 		# check path
 		# diagonal adjacent
 		if end==start+7*direction_factor or end==start+9*direction_factor:
-			# toggle/remove start
-			if start<32:
-				self.__nums[abs(direction_factor-1)]^=(1<<start) 
-			else:
-				self.__nums[abs(direction_factor-1)+1]^=(1<<(start-32))
-			# toggle/add end
-			if end<32:
-				self.__nums[abs(direction_factor-1)]^=(1<<end) 
-			else:
-				self.__nums[abs(direction_factor-1)+1]^=(1<<(end-32))
+			self.toggle_start_and_end(start, end, direction_factor) # nums and board
 			nums_string=self.int_list_2_str_list_str(self.__nums)
-			print nums_string
-			# same logic applied to board
-			self.__board[start]=0
-			self.__board[end]=direction_factor
 			# check winner
 			username=self.check_winner()
 			# toggle currentPlayer
 			self.__currentPlayer=self.__currentPlayer.get_opponent()
 			return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
 		# diagonal skip
-		if end==start+14*direction_factor or end==start+18*direction_factor:
-			# toggle/remove start
-			if start<32:
-				self.__nums[abs(direction_factor-1)]^=(1<<start) 
-			else:
-				self.__nums[abs(direction_factor-1)+1]^=(1<<(start-32))
-			# toggle/add end
-			if end<32:
-				self.__nums[abs(direction_factor-1)]^=(1<<end) 
-			else:
-				self.__nums[abs(direction_factor-1)+1]^=(1<<(end-32))
+		if self.__board[start+7*direction_factor]==-direction_factor and self.__board[start+14*direction_factor]==0:
+			res=self.dfs(start+14*direction_factor, end, [start+7*direction_factor], direction_factor)
+			if res[0]:
+				self.toggle_start_and_end(start, end, direction_factor) # nums and board
+				self.toggle_middles(res[1],direction_factor)
+				nums_string=self.int_list_2_str_list_str(self.__nums)
+				# check winner
+				username=self.check_winner()
+				# toggle currentPlayer
+				self.__currentPlayer=self.__currentPlayer.get_opponent()
+				return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
+		if self.__board[start+9*direction_factor]==-direction_factor and self.__board[start+18*direction_factor]==0:
+			res=self.dfs(start+18*direction_factor, end, [start+9*direction_factor], direction_factor)
+			if res[0]:
+				self.toggle_start_and_end(start, end, direction_factor) # nums and board
+				self.toggle_middles(res[1],direction_factor)
+				nums_string=self.int_list_2_str_list_str(self.__nums)
+				# check winner
+				username=self.check_winner()
+				# toggle currentPlayer
+				self.__currentPlayer=self.__currentPlayer.get_opponent()
+				return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'			
+		return '{"command":"click","action":"none","actionDetail":["Invalid path."],"winner":"__None__"}'
+
+
+
+	def toggle_start_and_end(self, start, end, direction_factor):
+		# toggle/remove start
+		if start<32:
+			self.__nums[abs(direction_factor-1)]^=(1<<start) 
+		else:
+			self.__nums[abs(direction_factor-1)+1]^=(1<<(start-32))
+		# toggle/add end
+		if end<32:
+			self.__nums[abs(direction_factor-1)]^=(1<<end) 
+		else:
+			self.__nums[abs(direction_factor-1)+1]^=(1<<(end-32))
+		# same logic applied to board
+		self.__board[start]=0
+		self.__board[end]=direction_factor
+
+
+
+	def toggle_middles(self, middles, direction_factor):
+		for middle in middles:
 			# remove/toggle middle (opponent's)
-			middle=(start+end)/2
 			if middle<32:
 				self.__nums[abs((-direction_factor)-1)]^=(1<<middle) 
 			else:
 				self.__nums[abs((-direction_factor)-1)+1]^=(1<<(middle-32))
-			nums_string=self.int_list_2_str_list_str(self.__nums)
-			print nums_string
 			# same logic applied to board
-			self.__board[start]=0
-			self.__board[end]=direction_factor
 			self.__board[middle]=0
-			# check winner
-			username=self.check_winner()
-			# toggle currentPlayer
-			self.__currentPlayer=self.__currentPlayer.get_opponent()
-			return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
-		return '{"command":"click","action":"none","actionDetail":["Invalid path."],"winner":"__None__"}'
-
 
 
 
@@ -164,4 +172,30 @@ class Game(Thread):
 		if n & 0x80000000:
 			n =- 0x100000000+n
 		return n
+
+
+
+
+	def dfs(self, start, end, middles, direction_factor):
+		if end==start:
+			return True, middles
+		if direction_factor==1 and end<start:
+			return False, []
+		if direction_factor==-1 and end>start:
+			return False, []
+		if self.__board[start+14*direction_factor]==0 and self.__board[start+7*direction_factor]==-direction_factor:
+			middles.append(start+7*direction_factor)
+			res=dfs(start+14*direction_factor, end, middles, direction_factor)
+			if res[0]:
+				return True, res[1]
+			middles.pop()
+		if self.__board[start+18*direction_factor]==0 and self.__board[start+9*direction_factor]==-direction_factor:
+			middles.append(start+9*direction_factor)
+			res=dfs(start+18*direction_factor, end, middles, direction_factor)
+			if res[0]:
+				return True, res[1]
+			middles.pop()
+		return False, []
+
+
 

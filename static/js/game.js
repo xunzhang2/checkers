@@ -61,6 +61,7 @@ function clickHandler(){
 	console.log('myturn'+String(myTurn));
 	console.log('start'+String(start));
 	if(!myTurn){
+		$("#game_intro")[0].innerHTML='Not your turn.';
 		return;
 	}
 	let isFilled=getBox(boxId).children[0].classList.contains('glyphicon')
