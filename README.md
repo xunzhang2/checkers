@@ -24,7 +24,7 @@ main controller |socket connection<----gateway| <-----send request-----  view co
 
 main controller |one socket connection----> dispatcher| -----dispatch response----> |gateway------>handlers| view controllers </br>
 
-## Time spent in dev
+## Time spent on dev
 1.5 days + 2 nights</br>
 
 ## How to run locally
