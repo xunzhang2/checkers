@@ -9,7 +9,7 @@ Front end: jQuery, angularjs, socketio, bootstrap, javascript </br>
 
 ## Design
 ==========Back end==========</br>
-class Game (Thread)</br>
+class Game extends Thread</br>
 class Player</br>
 
 One game contains one current_player which points to opponent. Two players points to each other.</br>
