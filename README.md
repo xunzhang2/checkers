@@ -6,6 +6,11 @@ Front end: jQuery, angularjs, socketio, bootstrap, javascript </br>
 
 ## Design
 ==========Back end==========</br>
+class Game (Thread)</br>
+class Player</br>
+
+One game contains one current_player which points to opponent. Two players points to each other.</br>
+
 class Game (Thread) contains: </br>
     current player (Player) <--(points each other)--> opponent (Player)</br>
     board array: len=64, val in (-1, 0, 1)</br>
