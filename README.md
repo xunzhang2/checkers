@@ -21,6 +21,15 @@ main controller |socket connection<----gateway| <-----send request-----  view co
 
 main controller |one socket connection----> dispatcher| -----dispatch response----> |gateway------>handlers| view controllers </br>
 
+## Time spent in dev
+1.5 days + 2 nights</br>
+
+## How to run locally
+
+pip install Flask</br>
+pip install flask-socketio</br>
+python app.py</br>
+
 
     
  
