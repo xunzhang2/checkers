@@ -14,7 +14,7 @@ class Player</br>
 
 One game contains one current_player which points to opponent. Two players points to each other.</br>
     
-class Model: mocks memory and database, recording runtime players and games status. (In production db should be used.) </br>
+class Model: represents memory and mocks database, recording runtime players and games status. (In production db should be used.) </br>
 </br>
 Gateway (app.py) receives incoming requests and creates games(threads) to do work. Or if game exists, "notify" it. </br>
 
