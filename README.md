@@ -24,9 +24,9 @@ Gateway (app.py) receives incoming requests and creates threads to do work.
 
 
 ==========Front end==========
-main controller [socket connection<----gateway] <-----send request-----  view controllers
+main controller |socket connection<----gateway| <-----send request-----  view controllers
 
-main controller [one socket connection----> dispatcher] -----dispatch response----> [gateway------>handlers] view controllers
+main controller |one socket connection----> dispatcher| -----dispatch response----> |gateway------>handlers| view controllers
 
 
     
