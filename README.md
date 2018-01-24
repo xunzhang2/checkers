@@ -1,5 +1,8 @@
 # Two-player Checkers
 
+## Youtube demo
+https://www.youtube.com/watch?v=aiqTH5YXh2o
+
 ## Tools
 Back end: flask, flask-socketio, python </br>
 Front end: jQuery, angularjs, socketio, bootstrap, javascript </br>
