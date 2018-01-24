@@ -29,6 +29,7 @@ class Game(Thread):
 		self.__room=room
 		self.__json=None
 		self.__response=None
+		self.__isEnd=False
 
 
 	def set_json(self, json):
@@ -67,6 +68,9 @@ class Game(Thread):
 	# start and end are always within range			
 	# "input_stream": __self.json
 	def handle_request(self, start, end):
+		if self.__isEnd:
+			return '{"command":"click","action":"none","actionDetail":["Game is over."],"winner":"__None__"}'
+
 		start=int(start)
 		end=int(end)
 		direction_factor= 1 if self.__json['side']=='+' else -1
@@ -155,6 +159,8 @@ class Game(Thread):
 				if self.__board[x]==1:
 					username=self.__currentPlayer.get_username() if (self.__currentPlayer.get_side()=='+') else self.__currentPlayer.get_opponent().get_username()
 		# run out of chessman?
+		if not username=='__None__':
+			self.__isEnd=True
 		return username
 
 

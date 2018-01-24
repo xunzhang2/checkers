@@ -52,6 +52,7 @@ function getBox(boxId) {
 
 
 function clickHandler(){
+	console.log(isEnd)
 	if(isEnd){
 		console.log('game over. abort.')
 		return;
@@ -105,6 +106,10 @@ function updateBoard(json){
 
 		mask<<=1;
 	}
+
+	$("#game_intro")[0].innerHTML="success";
+
+
 	// check winner
 	if(json.winner!='__None__'){
 		$("#game_intro")[0].innerHTML='Game over. The winner is '+ json.winner+'.';
@@ -117,8 +122,6 @@ function updateBoard(json){
 
 	// clear start point
 	start=null;
-
-	$("#game_intro")[0].innerHTML="success";
 }
 
 
