@@ -185,13 +185,13 @@ class Game(Thread):
 			return False, []
 		if self.__board[start+14*direction_factor]==0 and self.__board[start+7*direction_factor]==-direction_factor:
 			middles.append(start+7*direction_factor)
-			res=dfs(start+14*direction_factor, end, middles, direction_factor)
+			res=self.dfs(start+14*direction_factor, end, middles, direction_factor)
 			if res[0]:
 				return True, res[1]
 			middles.pop()
 		if self.__board[start+18*direction_factor]==0 and self.__board[start+9*direction_factor]==-direction_factor:
 			middles.append(start+9*direction_factor)
-			res=dfs(start+18*direction_factor, end, middles, direction_factor)
+			res=self.dfs(start+18*direction_factor, end, middles, direction_factor)
 			if res[0]:
 				return True, res[1]
 			middles.pop()
