@@ -35,6 +35,13 @@
 
 .glyphicon {
     font-size: 50px;
+
+    border-radius: 50%;
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 1);
+}
+
+.glyphicon:active {
+  box-shadow: 0 1px 0 #00823F;
 }
 
 .glyphicon-plus-sign{
@@ -45,6 +52,30 @@
   color: #0066ff;
 }
 
+.right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
 
 
+#logout_wrapper .text_leave {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  visibility:hidden;
+}
+
+#logout_wrapper:hover .text_leave {
+  visibility:visible;
+}
+
+.glyphicon-log-out{
+  font-size: 50px;
+}
+
+span {
+  display: inline-block;
+  width: 500px;
+}
 
