@@ -85,8 +85,12 @@ class Game(Thread):
 		if self.__board[end]!=0:
 			return '{"command":"click","action":"none","actionDetail":["Invalid end point."],"winner":"__None__"}'
 		# check path
+		start_row=start/8
+		start_col=start%8
+		end_row=end/8
+		end_col=end%8
 		# diagonal adjacent
-		if end==start+7*direction_factor or end==start+9*direction_factor:
+		if (start_col>0 and end==(start_row+direction_factor)*8+(start_col-1)) or (start_col<7 and end==(start_row+direction_factor)*8+(start_col+1)):
 			self.toggle_start_and_end(start, end, direction_factor) # nums and board
 			nums_string=self.int_list_2_str_list_str(self.__nums)
 			# check winner
@@ -94,29 +98,18 @@ class Game(Thread):
 			# toggle currentPlayer
 			self.__currentPlayer=self.__currentPlayer.get_opponent()
 			return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
-		# diagonal skip
-		if self.__board[start+7*direction_factor]==-direction_factor and self.__board[start+14*direction_factor]==0:
-			res=self.dfs(start+14*direction_factor, end, [start+7*direction_factor], direction_factor)
-			if res[0]:
-				self.toggle_start_and_end(start, end, direction_factor) # nums and board
-				self.toggle_middles(res[1],direction_factor)
-				nums_string=self.int_list_2_str_list_str(self.__nums)
-				# check winner
-				username=self.check_winner()
-				# toggle currentPlayer
-				self.__currentPlayer=self.__currentPlayer.get_opponent()
-				return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
-		if self.__board[start+9*direction_factor]==-direction_factor and self.__board[start+18*direction_factor]==0:
-			res=self.dfs(start+18*direction_factor, end, [start+9*direction_factor], direction_factor)
-			if res[0]:
-				self.toggle_start_and_end(start, end, direction_factor) # nums and board
-				self.toggle_middles(res[1],direction_factor)
-				nums_string=self.int_list_2_str_list_str(self.__nums)
-				# check winner
-				username=self.check_winner()
-				# toggle currentPlayer
-				self.__currentPlayer=self.__currentPlayer.get_opponent()
-				return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'			
+		# succesive diagonal skip
+		res=self.dfs(start_row, start_col, end_row, end_col, [], direction_factor)
+		if res[0]:
+			self.toggle_start_and_end(start, end, direction_factor) # nums and board
+			self.toggle_middles(res[1],direction_factor)
+			nums_string=self.int_list_2_str_list_str(self.__nums)
+			# check winner
+			username=self.check_winner()
+			# toggle currentPlayer
+			self.__currentPlayer=self.__currentPlayer.get_opponent()
+			return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
+	
 		return '{"command":"click","action":"none","actionDetail":["Invalid path."],"winner":"__None__"}'
 
 
@@ -182,26 +175,18 @@ class Game(Thread):
 
 
 
-
-	def dfs(self, start, end, middles, direction_factor):
-		if end==start:
+	# direction_factor is in fact "vertical_direction_factor"
+	def dfs(self, start_row, start_col, end_row, end_col, middles, direction_factor):
+		if start_row==end_row and start_col==end_col:
 			return True, middles
-		if direction_factor==1 and end<start:
-			return False, []
-		if direction_factor==-1 and end>start:
-			return False, []
-		if self.__board[start+14*direction_factor]==0 and self.__board[start+7*direction_factor]==-direction_factor:
-			middles.append(start+7*direction_factor)
-			res=self.dfs(start+14*direction_factor, end, middles, direction_factor)
-			if res[0]:
-				return True, res[1]
-			middles.pop()
-		if self.__board[start+18*direction_factor]==0 and self.__board[start+9*direction_factor]==-direction_factor:
-			middles.append(start+9*direction_factor)
-			res=self.dfs(start+18*direction_factor, end, middles, direction_factor)
-			if res[0]:
-				return True, res[1]
-			middles.pop()
+		for horizontal_direction_factor in (-1, 1):
+			tmp=(start_row+2*direction_factor)*8+(start_col+2*horizontal_direction_factor)
+			if start_col+2*horizontal_direction_factor>=0 and start_col+2*horizontal_direction_factor<8 and tmp>=0 and tmp<64 and self.__board[(start_row+direction_factor)*8+(start_col+horizontal_direction_factor)]==-direction_factor and self.__board[tmp]==0:
+				middles.append((start_row+direction_factor)*8+(start_col+horizontal_direction_factor))
+				res=self.dfs(start_row+2*direction_factor, start_col+2*horizontal_direction_factor, end_row, end_col, middles, direction_factor)
+				if res[0]:
+					return True, res[1]
+				middles.pop()
 		return False, []
 
 

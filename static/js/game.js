@@ -1,7 +1,6 @@
 'use strict';
 console.log('game.js');
 var start=null;
-var isEnd=false;
 
 $(document).ready(function(){
 	
@@ -52,11 +51,6 @@ function getBox(boxId) {
 
 
 function clickHandler(){
-	console.log(isEnd)
-	if(isEnd){
-		console.log('game over. abort.')
-		return;
-	}
 	let boxId=$(this).attr('id');
 	console.log("clickHandler!"+boxId);
 	console.log('myturn'+String(myTurn));
@@ -113,8 +107,6 @@ function updateBoard(json){
 	// check winner
 	if(json.winner!='__None__'){
 		$("#game_intro")[0].innerHTML='Game over. The winner is '+ json.winner+'.';
-		// end game
-		isEnd=true;
 	}
 	// take turns
 	console.log("take turns   "+username+"  "+json.currentPlayer);
