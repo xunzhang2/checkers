@@ -27,8 +27,9 @@ class Game(Thread):
 		self.__currentPlayer=currentPlayer
 		self.__board, self.__nums=self.init_board_and_nums()
 		self.__room=room
-		self.__json=None
+		self.__json=None   # mocks input stream in java
 		self.__response=None
+		self.__isActive=True  # reserved for collecting finished game threads
 		self.__isEnd=False
 
 
@@ -51,23 +52,24 @@ class Game(Thread):
 	
 
 	def run(self):
-		while True:
-			while self.__currentPlayer and self.__currentPlayer.get_opponent():
+		while self.__isActive:
+			print 'Game waiting for player!'
+			while self.__currentPlayer and self.__currentPlayer.get_opponent() and self.__currentPlayer.is_active() and self.__currentPlayer.get_opponent().is_active():
 				print 'Game starts!'
 				while self.__json:
 					print 'Game calculates!'
 					print str(self.__json)
-					self.__response=self.handle_request(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
+					self.__response=self.handle_move(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
 					print '**return response',self.__response
 					self.__json=None
 				time.sleep(2)
 			time.sleep(5)
+		print 'Game is inactive!'
 
 	
 
 	# start and end are always within range			
-	# "input_stream": __self.json
-	def handle_request(self, start, end):
+	def handle_move(self, start, end):
 		if self.__isEnd:
 			return '{"command":"click","action":"none","actionDetail":["Game is over."],"winner":"__None__"}'
 

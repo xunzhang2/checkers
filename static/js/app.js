@@ -41,6 +41,9 @@ function app_gateway(command, data){
 		socket.emit('join','{"command":"join","room":"'+room+'","username":"'+username+'"}');
 	}else if(command=='click'){
 		socket.emit('json',data);
+	}else if(command=='leave'){
+		socket.emit('leave','{"command":"leave","room":"'+data+'","username":"'+username+'"}');
+		socket.disconnect();
 	}
 }
 
@@ -55,6 +58,8 @@ function on_response(response){
 		welcome_gateway('join',json);
 	}else if(command=='click'){
 		game_gateway('click',json);
+	}else if(command=='leave'){
+		game_gateway('leave',json);
 	}
 }
 

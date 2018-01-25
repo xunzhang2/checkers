@@ -6,6 +6,16 @@ class Player:
 		self.__side=side
 		self.__room=room
 		self.__username=username
+		self.__isActive=True
+
+
+
+	def get_id(self):
+		return self.__id
+
+
+	def set_id(self, id):
+		self.__id=id
 
 
 	def get_opponent(self):
@@ -30,6 +40,14 @@ class Player:
 
 	def get_side(self):
 		return self.__side
+
+
+	def is_active(self):
+		return self.__isActive
+
+
+	def set_isActive(self, isActive):
+		self.__isActive=isActive
 
 
 

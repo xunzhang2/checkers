@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, copy_current_request_context
-from flask_socketio import SocketIO, join_room
+from flask_socketio import SocketIO, join_room, leave_room
 from model import Model
 from game import Game
 from player import Player
@@ -93,9 +93,31 @@ def on_join(data):
 
 
 
+@socketio.on('leave')
+def on_leave(data):
+	print 'leave! data=', str(data), 'sid=', request.sid
+	jsonDict=JSON.loads(data)
+	username = str(jsonDict['username'])
+	room = str(jsonDict['room'])
+	leave_room(room)
+	socketio.emit('response', '{"command":"leave","username":"'+username+'"}', room=room)
+	# change server status
+	@copy_current_request_context
+	def handle_leave(room):
+		# retrieve game
+		game=model.get_game(room)
+		sid=str(request.sid)
+		if game.get_current_player().get_id()==sid:
+			game.get_current_player().set_isActive(False)
+		elif game.get_current_player().get_opponent().get_id()==sid:
+			game.get_current_player().get_opponent().set_isActive(False)
 
-def handle_leave(sid):
-	pass
+	socketio.start_background_task(handle_leave,(room))
+
+
+
+
+
 
 
 

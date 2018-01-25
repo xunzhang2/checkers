@@ -28,6 +28,7 @@ $(document).ready(function(){
 
 	// setup onclick
 	$(".box").click(clickHandler);
+	$("#leave").click(clickHandler);
 });
 
 
@@ -51,28 +52,34 @@ function getBox(boxId) {
 
 
 function clickHandler(){
-	let boxId=$(this).attr('id');
-	console.log("clickHandler!"+boxId);
-	console.log('myturn'+String(myTurn));
-	console.log('start'+String(start));
-	if(!myTurn){
-		$("#game_intro")[0].innerHTML='Not your turn.';
-		return;
-	}
-	let isFilled=getBox(boxId).children[0].classList.contains('glyphicon')
-	if(start){  // start is filled
-		if(isFilled){
-			start=boxId;  // reset start
-		}else{
-			app_gateway('click','{"command":"click","start":"'+start+'", "end":"'+boxId+'"}');  // move!
+	if($(this).attr('id')=='leave'){
+		console.log('clicked leave! room='+room);
+		app_gateway('leave',room);
+	}else if(this.classList.contains('box')){
+		let boxId=$(this).attr('id');
+		console.log("clickHandler!"+boxId);
+		console.log('myturn'+String(myTurn));
+		console.log('start'+String(start));
+		if(!myTurn){
+			$("#game_intro")[0].innerHTML='Not your turn.';
+			return;
 		}
-	}else{   // start is empty
-		if(isFilled){
-			start=boxId;  // init start
-		}else{
-			;
+		let isFilled=getBox(boxId).children[0].classList.contains('glyphicon')
+		if(start){  // start is filled
+			if(isFilled){
+				start=boxId;  // reset start
+			}else{
+				app_gateway('click','{"command":"click","start":"'+start+'", "end":"'+boxId+'"}');  // move!
+			}
+		}else{   // start is empty
+			if(isFilled){
+				start=boxId;  // init start
+			}else{
+				;
+			}
 		}
 	}
+
 	
 }
 
@@ -127,9 +134,10 @@ function game_gateway(command, json){
 		switch(json.action){
 			case 'update': updateBoard(json); break;
 			// case 'show_hints': show_hints(json.actionDetail); break;
-			// case 'end': end_game(json.actionDetail[0]); break;
 			case 'none': explain_none(json.actionDetail[0]); break;
 		}
+	}else if(command=='leave'){
+		$("#game_intro")[0].innerHTML=json.username+' has left the game.';
 	}
 }
 
