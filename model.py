@@ -44,3 +44,7 @@ class Model(object):
 		return self.__playerDict[str(sid)]
 
 
+	def remove_player(self, sid):
+		self.__playerDict.pop(str(sid))
+
+

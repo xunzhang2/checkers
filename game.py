@@ -59,7 +59,14 @@ class Game(Thread):
 				while self.__json:
 					print 'Game calculates!'
 					print str(self.__json)
-					self.__response=self.handle_move(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
+					if self.__json['command']=='click':
+						self.__response=self.handle_move(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
+					elif self.__json['command']=='resume':
+						nums_string=self.int_list_2_str_list_str(self.__nums)
+						# check winner
+						username=self.check_winner()
+						# set command='click', instead of 'resume'
+						self.__response='{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
 					print '**return response',self.__response
 					self.__json=None
 				time.sleep(2)

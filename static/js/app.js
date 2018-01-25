@@ -44,6 +44,11 @@ function app_gateway(command, data){
 	}else if(command=='leave'){
 		socket.emit('leave','{"command":"leave","room":"'+data+'","username":"'+username+'"}');
 		socket.disconnect();
+	}else if(command=='resume'){
+		socket=io.connect(endpoint);
+		socket.on('response', on_response);
+		let json=JSON.parse(data);
+		socket.emit('json','{"command":"resume","username":"'+json.username+'","room":"'+json.room+'"}');
 	}
 }
 
@@ -60,6 +65,8 @@ function on_response(response){
 		game_gateway('click',json);
 	}else if(command=='leave'){
 		game_gateway('leave',json);
+	}else if(command=='resume'){
+		welcome_gateway('resume',json);
 	}
 }
 

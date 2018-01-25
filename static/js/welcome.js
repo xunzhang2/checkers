@@ -4,12 +4,19 @@ console.log('welcome.js');
 
 
 $(document).ready(function(){
+	// setup enter trigger
+
+
 	// init display
 	$("#enter_username").hide();
 	$("#show_room").hide();
 
 	$("#enter_room_key").hide();
 	$("#enter_username_invited").hide();
+
+	$("#enter_room_key_resume").hide();
+	$("#enter_username_resume").hide();
+
 
 
 	// setup onclick
@@ -19,6 +26,10 @@ $(document).ready(function(){
 	$("#i_am_invited").click(i_am_invited);
 	$("#go_invited").click(go_invited);  // room_key
 	$("#go_invited_username").click(go_invited_username);
+
+	$("#resume").click(resume);
+	$("#go_resume").click(enter_room_key_resume);
+	$("#go_resume_username").click(enter_username_resume);
 });
 
 
@@ -44,7 +55,6 @@ function i_am_invited(){
 }
 
 
-// when username is entered
 function go_invited(){
 	room=$("#room_key_invited").val();
 	$("#enter_room_key").hide();
@@ -58,6 +68,23 @@ function go_invited_username(){
 }
 
 
+function resume(){
+	$("#welcome_btn_group").hide();
+	$("#enter_room_key_resume").show();
+}
+
+function enter_room_key_resume(){
+	$("#enter_room_key_resume").hide();
+	$("#enter_username_resume").show();
+}
+
+function enter_username_resume(){
+	room=$("#room_key_resume").val();
+	username=$("#username_resume").val();
+	app_gateway('resume','{"room":"'+room+'","username":"'+username+'"}');
+}
+
+
 function welcome_gateway(command, json){
 	if(command=='invite'){
 		room=json.room;
@@ -68,6 +95,10 @@ function welcome_gateway(command, json){
 			window.location.replace(endpoint+"/#/game");
 		}else{
 			$("#welcome_intro")[0].innerHTML=json.status+': '+json.statusDetail;
+		}
+	}else if(command=='resume'){
+		if(json.status=='success'){
+			window.location.replace(endpoint+"/#/game");
 		}
 	}
 }
