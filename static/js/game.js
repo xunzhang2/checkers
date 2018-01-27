@@ -38,16 +38,19 @@ function updateBox(boxId, isEmpty, side) {
 	let box=getBox(boxId);
 	if(isEmpty)
 		box.children[0].setAttribute('class', '');
-	else if(side=='+')
+	else if(side==1)
 		box.children[0].setAttribute('class', "glyphicon glyphicon-plus-sign");
-	else if(side=='-')
+	else if(side==-1)
 		box.children[0].setAttribute('class', "glyphicon glyphicon-minus-sign");
 }
 
 
 
 function getBox(boxId) {
-    return document.getElementById('wrapper').children[parseInt(boxId.split('_')[1])];
+	if(typeof boxId === 'number')
+		return document.getElementById('wrapper').children[boxId];
+	else if(typeof boxId === 'string')
+    	return document.getElementById('wrapper').children[parseInt(boxId.split('_')[1])];
 }
 
 
@@ -84,8 +87,8 @@ function clickHandler(){
 }
 
 
-function updateBoard(json){
-	console.log('====updateBoard====');
+function refreshBoard(json){
+	console.log('====refreshBoard====');
 	var mask=1;
 	var num0=parseInt(json.actionDetail[0]);
 	var num1=parseInt(json.actionDetail[1]);
@@ -108,7 +111,7 @@ function updateBoard(json){
 		mask<<=1;
 	}
 
-	$("#game_intro")[0].innerHTML="success";
+	$("#game_intro")[0].innerHTML="Board status has been synchronized with server.";
 
 
 	// check winner
@@ -124,6 +127,32 @@ function updateBoard(json){
 }
 
 
+function updateBoard(json){
+	let start_time=date.getTime();
+	
+	json.actionDetail.forEach((pair)=>{
+		if(pair.side==0)
+			updateBox(pair.boxId, true, 0);
+		else
+			updateBox(pair.boxId, false, pair.side);
+	});
+
+	$("#game_intro")[0].innerHTML="success";
+
+	// check winner
+	if(json.winner!='__None__'){
+		$("#game_intro")[0].innerHTML='Game over. The winner is '+ json.winner+'.';
+	}
+	// take turns
+	console.log("take turns   "+username+"  "+json.currentPlayer);
+	myTurn=(username==json.currentPlayer);
+
+	// clear start point
+	start=null;
+	console.log('====updateBoard===='+String(date.getTime()-start_time));
+}
+
+
 function explain_none(msg){
 	$("#game_intro")[0].innerHTML=msg;
 }
@@ -132,6 +161,7 @@ function explain_none(msg){
 function game_gateway(command, json){
 	if(command=='click'){
 		switch(json.action){
+			case 'refresh': refreshBoard(json); break;
 			case 'update': updateBoard(json); break;
 			// case 'show_hints': show_hints(json.actionDetail); break;
 			case 'none': explain_none(json.actionDetail[0]); break;

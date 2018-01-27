@@ -6,6 +6,7 @@ var endpoint=null;
 var username=null;
 var room=null;
 var myTurn=false;
+var date = new Date();
 
 
 $(document).ready(function(){
@@ -40,6 +41,7 @@ function app_gateway(command, data){
 
 		socket.emit('join','{"command":"join","room":"'+room+'","username":"'+username+'"}');
 	}else if(command=='click'){
+		console.log("click-> "+date.getTime());
 		socket.emit('json',data);
 	}else if(command=='leave'){
 		socket.emit('leave','{"command":"leave","room":"'+data+'","username":"'+username+'"}');
@@ -56,6 +58,7 @@ function on_response(response){
 	console.log('on_response='+response);
 	let json=JSON.parse(response);
 	let command=json.command;
+	console.log('<='+date.getTime());
 	if(command=='invite'){
 		welcome_gateway('invite',json);
 		myTurn=true; // invitors always start first

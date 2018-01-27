@@ -57,6 +57,7 @@ class Game(Thread):
 			while self.__currentPlayer and self.__currentPlayer.get_opponent() and self.__currentPlayer.is_active() and self.__currentPlayer.get_opponent().is_active():
 				print 'Game starts!'
 				while self.__json:
+					start_time=time.time()
 					print 'Game calculates!'
 					print str(self.__json)
 					if self.__json['command']=='click':
@@ -69,7 +70,8 @@ class Game(Thread):
 						self.__response='{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
 					print '**return response',self.__response
 					self.__json=None
-				time.sleep(2)
+					print '========time ',str(time.time()-start_time),'========'
+				time.sleep(0.5)
 			time.sleep(5)
 		print 'Game is inactive!'
 
@@ -100,30 +102,39 @@ class Game(Thread):
 		end_col=end%8
 		# diagonal adjacent
 		if (start_col>0 and end==(start_row+direction_factor)*8+(start_col-1)) or (start_col<7 and end==(start_row+direction_factor)*8+(start_col+1)):
-			self.toggle_start_and_end(start, end, direction_factor) # nums and board
-			nums_string=self.int_list_2_str_list_str(self.__nums)
+			change_dict=self.toggle_start_and_end(start, end, direction_factor,{}) # nums and board
+			# nums_string=self.int_list_2_str_list_str(self.__nums)
+			change_dict_str=self.change_dict_2_str(change_dict)
 			# check winner
 			username=self.check_winner()
 			# toggle currentPlayer
 			self.__currentPlayer=self.__currentPlayer.get_opponent()
-			return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
+			return '{"command":"click","action":"update","actionDetail":'+change_dict_str+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
 		# succesive diagonal skip
 		res=self.dfs(start_row, start_col, end_row, end_col, [], direction_factor)
 		if res[0]:
-			self.toggle_start_and_end(start, end, direction_factor) # nums and board
-			self.toggle_middles(res[1],direction_factor)
-			nums_string=self.int_list_2_str_list_str(self.__nums)
+			change_dict=self.toggle_start_and_end(start, end, direction_factor, {}) # nums and board
+			change_dict=self.toggle_middles(res[1],direction_factor, change_dict)
+			# nums_string=self.int_list_2_str_list_str(self.__nums)
+			change_dict_str=self.change_dict_2_str(change_dict)
 			# check winner
 			username=self.check_winner()
 			# toggle currentPlayer
 			self.__currentPlayer=self.__currentPlayer.get_opponent()
-			return '{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
-	
+			return '{"command":"click","action":"update","actionDetail":'+change_dict_str+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
 		return '{"command":"click","action":"none","actionDetail":["Invalid path."],"winner":"__None__"}'
 
 
+	def change_dict_2_str(self, dict):
+		s='['
+		for k,v in dict.iteritems():
+			s+='{"boxId":'+str(k)+',"side":'+str(v)+'},'
+		s=s[:-1]
+		return s+']'
 
-	def toggle_start_and_end(self, start, end, direction_factor):
+
+	# change_dict: key=int index, val=int direction_factor
+	def toggle_start_and_end(self, start, end, direction_factor, change_dict):
 		# toggle/remove start
 		if start<32:
 			self.__nums[abs(direction_factor-1)]^=(1<<start) 
@@ -137,18 +148,25 @@ class Game(Thread):
 		# same logic applied to board
 		self.__board[start]=0
 		self.__board[end]=direction_factor
+		# same logic applied to change_dict
+		change_dict[start]=0
+		change_dict[end]=direction_factor
+		return change_dict
 
 
 
-	def toggle_middles(self, middles, direction_factor):
+	def toggle_middles(self, middles, direction_factor, change_dict):
 		for middle in middles:
-			# remove/toggle middle (opponent's)
+			# toggle/remove middle (opponent's)
 			if middle<32:
 				self.__nums[abs((-direction_factor)-1)]^=(1<<middle) 
 			else:
 				self.__nums[abs((-direction_factor)-1)+1]^=(1<<(middle-32))
 			# same logic applied to board
 			self.__board[middle]=0
+			# same logic applied to change_dict
+			change_dict[middle]=0
+		return change_dict
 
 
 
@@ -197,6 +215,8 @@ class Game(Thread):
 					return True, res[1]
 				middles.pop()
 		return False, []
+
+
 
 
 
