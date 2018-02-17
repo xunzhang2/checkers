@@ -54,10 +54,12 @@ function getBox(boxId) {
 }
 
 
-function clickHandler(){
+async function clickHandler(){
 	if($(this).attr('id')=='leave'){
 		console.log('clicked leave! room='+room);
 		app_gateway('leave',room);
+		await sleep(1000);
+		window.location.replace(endpoint+"/");
 	}else if(this.classList.contains('box')){
 		let boxId=$(this).attr('id');
 		console.log("clickHandler!"+boxId);
@@ -173,6 +175,11 @@ function game_gateway(command, json){
 	}else if(command=='leave'){
 		$("#game_intro")[0].innerHTML=json.username+' has left the game.';
 	}
+}
+
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
