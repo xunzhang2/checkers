@@ -110,8 +110,6 @@ def on_json(json):
 					response=game.get_response()
 					game.set_response(None)
 					condition.release()
-					# make sure send later
-					# time.sleep(0.5)
 					socketio.emit('response',response,room=room)
 				else:
 					response='{"command":"resume","status":"failure","statusDetail":"Cannot resume due to invalid username."}'
