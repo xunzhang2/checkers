@@ -1,7 +1,6 @@
 # Two-player Checkers
 
 ## Demo
-Website: http://34.230.44.118:5000/ </br>
 Video: https://www.youtube.com/watch?v=aiqTH5YXh2o  </br>
 
 ## Tools
@@ -18,12 +17,14 @@ One game contains one current_player which points to opponent. Two players point
 class Model: represents memory and mocks database, recording runtime players and games status. (In production db should be used.) </br>
 </br>
 Gateway (app.py) receives incoming requests and creates games(threads) to do work. Or if game exists, "notify" it. </br>
-
+Used threading.Condition to synchronize threads.</br>
 </br>
 ==========Front end==========</br>
 main controller |socket connection<----gateway| <-----send request-----  view controllers </br>
 
 main controller |one socket connection----> dispatcher| -----dispatch response----> |gateway------>handlers| view controllers </br>
+==========Algorithm==========</br>
+DFS, bit manipulation, ...</br>
 
 ## Time spent on dev
 1.5 days + 2 nights</br>
