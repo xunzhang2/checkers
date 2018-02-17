@@ -1,7 +1,7 @@
 # Two-player Checkers
 
 ## Demo
-[![Watch the video](https://github.com/xunzhang2/checkers/blob/master/screenshot2.png)](https://www.youtube.com/watch?v=S319CzQkpsQ)
+[![Watch the video](https://github.com/xunzhang2/checkers/blob/master/screenshot3.png)](https://www.youtube.com/watch?v=S319CzQkpsQ)
 
 ## Tools
 Back end: flask, flask-socketio, python </br>
