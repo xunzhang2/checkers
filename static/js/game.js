@@ -27,8 +27,8 @@ $(document).ready(function(){
 
 
 	// setup onclick
-	$(".box").click(clickHandler);
-	$("#leave").click(clickHandler);
+	$(".box").unbind('click').click(clickHandler);
+	$("#leave").unbind('click').click(clickHandler);
 });
 
 
@@ -97,16 +97,20 @@ function refreshBoard(json){
 
 	for(var i=0;i<32;i++){
 
+		if(i==27){
+			console.log("******"+String((mask&num0))+" | "+String(mask&num2))
+		}
+
 		if((mask&num0)||(mask&num2))
-			(mask&num0)?updateBox('box_'+i,false,'+'):updateBox('box_'+i,false,'-');
+			(mask&num0)?updateBox(i,false,1):updateBox(i,false,-1);
 		else
-			updateBox('box_'+i,true,'');
+			updateBox(i,true,0);
 
 
 		if((mask&num1)||(mask&num3))
-			(mask&num1)?updateBox('box_'+(i+32),false,'+'):updateBox('box_'+(i+32),false,'-');
+			(mask&num1)?updateBox(i+32,false,1):updateBox(i+32,false,-1);
 		else
-			updateBox('box_'+(i+32),true,'');
+			updateBox(i+32,true,0);
 
 		mask<<=1;
 	}

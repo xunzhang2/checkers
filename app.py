@@ -5,11 +5,14 @@ from game import Game
 from player import Player
 import json as JSON
 import time
+import threading
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 model=Model()
+condition = threading.Condition()
+# condition.acquire()  # make sure main thread firstly get lock
 
 
 
@@ -38,24 +41,36 @@ def on_json(json):
 		if command=='invite':
 			room=str(model.get_room(sid))
 			join_room(room,sid)
-			currentPlayer=Player(sid, None, '+', room, jsonDict['username'])
-			game=Game(currentPlayer, room)
+			currentPlayer=model.get_player(sid)
+			if not currentPlayer:
+				currentPlayer=Player(sid, None, '+', room, jsonDict['username'])
+			game=Game(currentPlayer, room, condition)
 			game.start()
 			model.put_game(room,game)
 			model.put_player(sid,currentPlayer)
 			response='{"command":"invite","status":"success","statusDetail":"Use room key to invite. Game automatically starts when the opponent joins.","room":"'+str(room)+'"}'
 			socketio.emit('response',response,room=room)
 		elif command=='click':
+			print 'click acquiring    !!!'
+			condition.acquire()
+			print 'click acquired    !!!'
 			room=str(model.get_room(sid))
 			game=model.get_game(room)
 			# put side
 			jsonDict['side']=model.get_player(sid).get_side()
 			game.set_json(jsonDict)
+			condition.notifyAll()
+			condition.release()
 			# waiting for game to calculate response
+			time.sleep(0.005) # make sure game threads get the lock
+			print 'click acquiring  2  !!!'
+			condition.acquire()
+			print 'click acquired  2  !!!'
 			while(not game.get_response()):
-				time.sleep(2)
+				condition.wait()
 			response=game.get_response()
 			game.set_response(None)
+			condition.release()
 			socketio.emit('response',response,room=room)
 		elif command=='resume':
 			room=str(jsonDict['room'])
@@ -65,6 +80,7 @@ def on_json(json):
 				# get player which may be invalid
 				# NOTE: avoid pretend as the other player!
 				player=None
+				print '+++++++++'+str(game.get_current_player().get_username())+" | "+str(game.get_current_player().is_active())+" | "+str(game.get_current_player().get_opponent().get_username())+" | "+str(game.get_current_player().get_opponent().is_active())
 				if game.get_current_player().get_username()==username and (not game.get_current_player().is_active()):
 					player=game.get_current_player()
 				elif game.get_current_player().get_opponent().get_username()==username and (not game.get_current_player().get_opponent().is_active()):
@@ -78,26 +94,30 @@ def on_json(json):
 					# join room
 					join_room(room,sid)
 					response='{"command":"resume","status":"success","statusDetail":"Game resumes."}'
-					print response
 					socketio.emit('response',response,room=room)
 					# retrieve status and update board, make sure send later
+					print 'acquiring    !!!'
+					condition.acquire()
+					print 'acquirED    !!!'
 					game.set_json(jsonDict)
+					condition.notifyAll()
+					condition.release()
 					# waiting for game to calculate response
+					time.sleep(1) # make sure game threads get the lock AND page is re-loaded
+					condition.acquire()
 					while(not game.get_response()):
-						time.sleep(2)
-					response=game.get_response()  # (response overwritten!)
-					print response
+						condition.wait()  # (response overwritten!)
+					response=game.get_response()
 					game.set_response(None)
+					condition.release()
 					# make sure send later
-					time.sleep(1)
+					# time.sleep(0.5)
 					socketio.emit('response',response,room=room)
 				else:
 					response='{"command":"resume","status":"failure","statusDetail":"Cannot resume due to invalid username."}'
-					print response
 					socketio.emit('response',response,room=room)
 			else:
 				response='{"command":"resume","status":"failure","statusDetail":"Cannot resume due to invalid room key."}'
-				print response
 				socketio.emit('response',response,room=room)
 	socketio.start_background_task(handle_request,(json))
 
@@ -115,7 +135,9 @@ def on_join(data):
 		room=str(jsonDict['room'])
 		# validate room
 		if model.is_room_valid(room):
-			anotherPlayer=Player(sid, None, '-', room, jsonDict['username'])
+			anotherPlayer=model.get_player(sid)
+			if(not anotherPlayer):
+				anotherPlayer=Player(sid, None, '-', room, jsonDict['username'])
 			# save player '-'
 			model.put_player(sid, anotherPlayer)
 			# retrieve game
@@ -123,6 +145,7 @@ def on_join(data):
 			# add player to game
 			anotherPlayer.set_opponent(game.get_current_player())
 			game.get_current_player().set_opponent(anotherPlayer)
+			print '***********'+str(anotherPlayer.get_opponent().get_username())+" | "+str(game.get_current_player().get_opponent().get_username())
 			# join room
 			join_room(room,sid)
 			response='{"command":"join","room":"'+room+'","player":"'+game.get_current_player().get_username()+'","opponent":"'+anotherPlayer.get_username()+'","status":"success","statusDetail":"success"}'

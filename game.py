@@ -22,7 +22,7 @@ class Game(Thread):
 
 
 
-	def __init__(self, currentPlayer, room):
+	def __init__(self, currentPlayer, room, condition):
 		Thread.__init__(self)
 		self.__currentPlayer=currentPlayer
 		self.__board, self.__nums=self.init_board_and_nums()
@@ -31,6 +31,7 @@ class Game(Thread):
 		self.__response=None
 		self.__isActive=True  # reserved for collecting finished game threads
 		self.__isEnd=False
+		self.__condition=condition
 
 
 	def set_json(self, json):
@@ -53,26 +54,30 @@ class Game(Thread):
 
 	def run(self):
 		while self.__isActive:
-			print 'Game waiting for player!'
+			print 'Game waiting for player!'+ str(self)+" | "+str(self.__currentPlayer)+" | "+str(self.__currentPlayer.get_opponent())+" | "+str(self.__currentPlayer.is_active() if self.__currentPlayer else "currentPlayer is null")+" | "+str(self.__currentPlayer.get_opponent().is_active() if self.__currentPlayer.get_opponent() else "oppo is null")
 			while self.__currentPlayer and self.__currentPlayer.get_opponent() and self.__currentPlayer.is_active() and self.__currentPlayer.get_opponent().is_active():
 				print 'Game starts!'
-				while self.__json:
-					start_time=time.time()
-					print 'Game calculates!'
-					print str(self.__json)
-					if self.__json['command']=='click':
-						self.__response=self.handle_move(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
-					elif self.__json['command']=='resume':
-						nums_string=self.int_list_2_str_list_str(self.__nums)
-						# check winner
-						username=self.check_winner()
-						# set command='click', instead of 'resume'
-						self.__response='{"command":"click","action":"update","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
-					print '**return response',self.__response
-					self.__json=None
-					print '========time ',str(time.time()-start_time),'========'
-				time.sleep(0.5)
-			time.sleep(5)
+				self.__condition.acquire()
+				while not self.__json:
+					self.__condition.wait()
+				# get an available item
+				start_time=time.time()
+				print 'Game calculates!'
+				print str(self.__json)
+				if self.__json['command']=='click':
+					self.__response=self.handle_move(self.__json['start'].split('_')[1],self.__json['end'].split('_')[1])
+				elif self.__json['command']=='resume':
+					nums_string=self.int_list_2_str_list_str(self.__nums)
+					# check winner
+					username=self.check_winner()
+					# set command='click', instead of 'resume'
+					self.__response='{"command":"click","action":"refresh","actionDetail":'+nums_string+',"winner":"'+username+'","currentPlayer":"'+self.__currentPlayer.get_username()+'"}'
+				print '**return response',self.__response
+				self.__json=None
+				print '========time ',str(time.time()-start_time),'========'
+				self.__condition.notifyAll()
+				self.__condition.release()
+			time.sleep(2)
 		print 'Game is inactive!'
 
 	
