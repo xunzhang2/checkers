@@ -1,6 +1,6 @@
 # Two-player Checkers
 
-## Demo
+## Demo (https://www.youtube.com/watch?v=S319CzQkpsQ)
 [![Watch the video](https://github.com/xunzhang2/checkers/blob/master/screenshot3.png)](https://www.youtube.com/watch?v=S319CzQkpsQ)
 
 ## Tools
