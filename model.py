@@ -34,14 +34,14 @@ class Model(object):
 
 
 	def get_game(self, room):
-		return self.__roomDict[str(room)]
+		return self.__roomDict.get(str(room))
 
 	def put_player(self, sid, player):
 		self.__playerDict[str(sid)]=player
 
 
 	def get_player(self, sid):
-		return self.__playerDict[str(sid)]
+		return self.__playerDict.get(str(sid))
 
 
 	def remove_player(self, sid):

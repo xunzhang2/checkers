@@ -20,16 +20,16 @@ $(document).ready(function(){
 
 
 	// setup onclick
-	$("#invite_opponent").click(invite_opponent);
+	$("#invite_opponent").unbind('click').click(invite_opponent);
 	$("#go").click(go);
 
-	$("#i_am_invited").click(i_am_invited);
-	$("#go_invited").click(go_invited);  // room_key
-	$("#go_invited_username").click(go_invited_username);
+	$("#i_am_invited").unbind('click').click(i_am_invited);
+	$("#go_invited").unbind('click').click(go_invited);  // room_key
+	$("#go_invited_username").unbind('click').click(go_invited_username);
 
-	$("#resume").click(resume);
-	$("#go_resume").click(enter_room_key_resume);
-	$("#go_resume_username").click(enter_username_resume);
+	$("#resume").unbind('click').click(resume);
+	$("#go_resume").unbind('click').click(enter_room_key_resume);
+	$("#go_resume_username").unbind('click').click(enter_username_resume);
 });
 
 
